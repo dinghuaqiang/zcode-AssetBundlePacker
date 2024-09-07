@@ -3,7 +3,9 @@
 * Note  : Application.streamingAssetsPath目录下拷贝
 ***************************************************************/
 using System.Collections;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace zcode
 {
@@ -38,19 +40,18 @@ namespace zcode
             SetResult(false, emIOOperateCode.Succeed, null);
             do
             {
-                using (WWW w = new WWW(src))
+                using (UnityWebRequest request = UnityWebRequest.Get(src))
                 {
-                    yield return w;
-
-                    if (!string.IsNullOrEmpty(w.error))
+                    yield return request.SendWebRequest();
+                    if (!string.IsNullOrEmpty(request.error))
                     {
-                        SetResult(true, emIOOperateCode.Fail, w.error);
+                        SetResult(true, emIOOperateCode.Fail, request.error);
                     }
                     else
                     {
-                        if (w.isDone && w.bytes.Length > 0)
+                        if (request.isDone && request.downloadHandler.data.Length > 0)
                         {
-                            var ret = zcode.FileHelper.WriteBytesToFile(dest, w.bytes, w.bytes.Length);
+                            var ret = zcode.FileHelper.WriteBytesToFile(dest, request.downloadHandler.data, request.downloadHandler.data.Length);
                             SetResult(true, ret, null);
                         }
                     }

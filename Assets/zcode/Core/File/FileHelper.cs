@@ -9,6 +9,8 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Networking;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 namespace zcode
 {
@@ -259,14 +261,21 @@ namespace zcode
         /// </summary>
         static IEnumerator LoadAssetbundleFromLocal(string path, string name)
         {
-            WWW w = new WWW("file:///" + path + "/" + name);
-
-            yield return w;
-
-            if (w.isDone)
+            //AssetBundle.LoadFromFile("file:///" + path + "/" + name);
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle("file:///" + path + "/" + name);
+            yield return request.SendWebRequest();
+            AssetBundleCreateRequest bundle = null;
+            if (!string.IsNullOrEmpty(request.error))
             {
-                GameObject.Instantiate(w.assetBundle.mainAsset);
+                Debug.LogErrorFormat("Load ab failed, {0}", request.error);
             }
+            while (!request.isDone)
+            {
+                bundle = AssetBundle.LoadFromMemoryAsync(request.downloadHandler.data);
+            }
+            GameObject.Instantiate(bundle.assetBundle);
+            //false是只卸载bundle的内存，不卸载实例化之后的内存，如果设置true就会全部卸载掉
+            bundle.assetBundle.Unload(false);
         }
 
         /// <summary>
@@ -280,20 +289,18 @@ namespace zcode
             bool is_done = false;
             do 
             {
-                using (WWW w = new WWW(src))
+                using (UnityWebRequest request = UnityWebRequest.Get(src))
                 {
-                    yield return w;
-
-                    if (!string.IsNullOrEmpty(w.error))
+                    yield return request.SendWebRequest();
+                    if (string.IsNullOrEmpty(request.error))
                     {
                         is_done = false;
-                        Debug.LogWarning(w.error);
+                        Debug.LogWarning(request.error);
                     }
                     else
                     {
-                        if (w.isDone && w.bytes.Length > 0)
-                            zcode.FileHelper.WriteBytesToFile(dest, w.bytes, w.bytes.Length);
-
+                        if (request.isDone && request.downloadHandler.data.Length > 0)
+                            FileHelper.WriteBytesToFile(dest, request.downloadHandler.data, request.downloadHandler.data.Length);
                         is_done = true;
                     }
                 }
