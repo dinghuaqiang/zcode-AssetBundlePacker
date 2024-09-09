@@ -7,10 +7,8 @@
 using UnityEngine;
 using System.Collections;
 using System.IO;
-using System.Collections.Generic;
 using System;
 using UnityEngine.Networking;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 namespace zcode
 {

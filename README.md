@@ -23,7 +23,7 @@ Unity的AssetBundle模块扩展插件，主要目的用于简化AssetBundle打�
 		|-Plugins							- 引用的第三方插件
 		|-ThridParty						- 引用的第三方库
 		|-zcode								- 核心目录
-			|-AssetBoundlePacker			- AssetBoundlePacker插件源码目录
+			|-AssetBundlePacker			- AssetBundlePacker插件源码目录
 			|-Core							- 公共类、函数等源代码
 	
 ## 如何打包AssetBundle

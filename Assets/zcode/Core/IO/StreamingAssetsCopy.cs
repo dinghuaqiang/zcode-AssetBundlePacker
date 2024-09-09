@@ -3,8 +3,6 @@
 * Note  : Application.streamingAssetsPath目录下拷贝
 ***************************************************************/
 using System.Collections;
-using UnityEditor.PackageManager.Requests;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace zcode
